@@ -1,15 +1,15 @@
 # DAGtags
 
-**Treat your nested tags as a directed acyclic graph. Find any sub-tag, under any parent, straight from Obsidian's core search pane.**
-
-![Latest release](https://img.shields.io/github/v/release/Neomoorea/obsidian-dagtags?style=flat-square)
 ![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue?style=flat-square)
+![Latest release](https://img.shields.io/github/v/release/Neomoorea/obsidian-dagtags?style=flat-square)
 ![Obsidian 1.5.0+](https://img.shields.io/badge/obsidian-1.5.0%2B-7c3aed?style=flat-square)
+
+**Treat your nested tags as a directed acyclic graph. Find any sub-tag, under any parent, straight from Obsidian's core search pane.**
 
 ```text
 tag:#*/B          →  (tag:#A/B OR tag:#C/B)
 tag:#*/B/**       →  (tag:#A/B OR tag:#C/B OR tag:#D/B/F)
-tag:#**/personal  →  (tag:#personal OR tag:#work/personal OR ...)
+tag:#**/B  →  (tag:#B OR tag:#A/C/B OR ...)
 ```
 
 ## Why
@@ -23,7 +23,7 @@ graph LR
   D --> B --> F
 ```
 
-`#A/B`, `#C/B` and `#D/B/F` all contain the same node `B`. Native search cannot follow it: `tag:` only accepts an exact path, and the usual workaround, a regex such as `#(?:[^/\s]+/)*personal\b`, is clumsy, slow, misses tags declared in frontmatter, and also matches things like `#work/personal-stuff`.
+`#A/B`, `#C/B` and `#D/B/F` all contain the same node `B`. Native search cannot follow it: `tag:` only accepts an exact path, and the usual workaround, a regex such as `#(?:[^/\s]+/)*personal\b`, is clumsy, slow, misses tags declared in frontmatter, and also matches things like `#C/BB`.
 
 DAGtags lets you query by **node** instead of by full path. Type a pattern in the search field, press **Enter**, and it is rewritten into native `tag:` searches. Obsidian does the rest.
 
@@ -83,36 +83,37 @@ Type a tag pattern in the search pane and press **Enter**. Assuming a vault with
 
 ## Installation
 
-### Manual
+Requires Obsidian 1.5.0 or later.
+
+### Option A — with BRAT
+
+1. Install **BRAT** (Beta Reviewer's Auto-update
+   Tool) from Obsidian's Community Plugins browser, and enable it.
+2. Command palette → **BRAT: Add a beta plugin for testing**, then add
+   `Neomoorea/obsidian-daynest`.
+3. Enable **DAGtags** under Community plugins.
+
+### Option B — manual install
 
 1. Download `main.js` and `manifest.json` from the [latest release](https://github.com/Neomoorea/obsidian-dagtags/releases/latest).
 2. Copy them into `<your vault>/.obsidian/plugins/dagtags/`.
 3. Reload Obsidian and enable **DAGtags** under *Settings → Community plugins*.
 
-### With BRAT
 
-Install [BRAT](https://github.com/TfTHacker/obsidian42-brat), then add `Neomoorea/obsidian-dagtags` as a beta plugin.
-
-## Development
+### Option C — build from source
 
 ```bash
 git clone https://github.com/Neomoorea/obsidian-dagtags.git
 cd obsidian-dagtags
 npm install
-npm test          # unit tests for the matching logic and the search-field hook
 npm run build     # type-check against the Obsidian typings, then bundle main.js
-npm run dev       # bundle with inline source maps
 ```
 
-To try it, symlink or copy the folder into `<vault>/.obsidian/plugins/dagtags/`. The pattern matching lives in `src/expand.ts` and has no Obsidian dependency; `src/main.ts` is the thin plugin layer.
-
-### Releasing
-
-```bash
-npm version patch        # bumps package.json, manifest.json and versions.json, and commits
-git push --follow-tags   # the Release workflow builds and publishes main.js + manifest.json
-```
+This produces `main.js` and `manifest.json` at the
+project root — copy those three files into `.obsidian/plugins/dagtags/`
+as above. `npm run dev` runs an incremental watch build if you want to
+modify the plugin.
 
 ## Licence
 
-[MIT](LICENSE) © Neomoorea
+MIT — see [LICENSE](LICENSE) for details.

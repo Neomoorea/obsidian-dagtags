@@ -1,7 +1,0 @@
-node_modules/
-.test-build/
-# Build artefact: attached to GitHub releases, not committed
-main.js
-*.js.map
-data.json
-.DS_Store
