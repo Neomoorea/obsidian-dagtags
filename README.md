@@ -23,7 +23,7 @@ graph LR
   projects --> fiction --> mynovel
 ```
 
-`#novel/fiction`, `#play/fiction` and `#projects/fiction/mynovel` all contain the same node `fiction`. Native search cannot follow it: `tag:` only accepts an exact path, and the usual workaround, a regex such as `#(?:[^/\s]+/)*fiction\b`, is clumsy, slow, unsupported by vanilla Obsidian, misses tags declared in frontmatter, and also matches things like `#play/unrealisticfiction`.
+`#novel/fiction`, `#play/fiction` and `#projects/fiction/mynovel` all contain the same node `fiction`. Native search cannot follow it: `tag:` only accepts an exact path, and the usual workaround, a regex such as `#(?:[^/\s]+/)*fiction\b`, is clumsy, slow, unsupported by vanilla Obsidian, misses tags declared in frontmatter, and also matches things like `#play/fiction-draft`.
 
 DAGtags lets you query by **node** instead of by full path. Type a pattern in the search field, press **Enter**, and it is rewritten into native `tag:` searches. Obsidian does the rest.
 
@@ -89,7 +89,7 @@ Requires Obsidian 1.5.0 or later.
 1. Install **BRAT** (Beta Reviewer's Auto-update
    Tool) from Obsidian's Community Plugins browser, and enable it.
 2. Command palette → **BRAT: Add a beta plugin for testing**, then add
-   `Neomoorea/obsidian-daynest`.
+   `Neomoorea/obsidian-dagtags`.
 3. Enable **DAGtags** under Community plugins.
 
 ### Option B — manual install
@@ -109,7 +109,7 @@ npm run build
 ```
 
 This produces `main.js` and `manifest.json` at the
-project root — copy those three files into `.obsidian/plugins/dagtags/`
+project root — copy those two files into `.obsidian/plugins/dagtags/`
 as above. `npm run dev` runs an incremental watch build if you want to
 modify the plugin.
 

@@ -20,9 +20,13 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
-      - name: Create GitHub release with the files Obsidian needs
+      - name: Publish release files
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="${GITHUB_REF#refs/tags/}"
-          gh release create "$tag" --title="$tag" --generate-notes main.js manifest.json
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" main.js manifest.json --clobber
+          else
+            gh release create "$tag" --title="$tag" --generate-notes main.js manifest.json
+          fi
