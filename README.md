@@ -4,7 +4,7 @@
 ![Latest release](https://img.shields.io/github/v/release/Neomoorea/obsidian-dagtags?style=flat-square)
 ![Obsidian 1.5.0+](https://img.shields.io/badge/obsidian-1.5.0%2B-7c3aed?style=flat-square)
 
-**Treat your nested tags as a directed acyclic graph. Find any sub-tag, under any parent, straight from Obsidian's core search pane.**
+**Treat your nested tags as a directed acyclic graph. Find any subtag, under any parent, straight from Obsidian's core search pane.**
 
 ```text
 tag:#*/B          →  (tag:#A/B OR tag:#C/B)
@@ -14,16 +14,16 @@ tag:#**/B  →  (tag:#B OR tag:#A/C/B OR ...)
 
 ## Why
 
-Obsidian's nested tags look like a tree, but you rarely use them like one. A sub-tag such as `#personal` or `#B` often sits under several parents:
+Obsidian's nested tags look like a tree, but you rarely use them like one. A subtag such as `#fiction` often sits under several parents:
 
 ```mermaid
 graph LR
-  A --> B
-  C --> B
-  D --> B --> F
+  novel --> fiction
+  play --> fiction
+  projects --> fiction --> mynovel
 ```
 
-`#A/B`, `#C/B` and `#D/B/F` all contain the same node `B`. Native search cannot follow it: `tag:` only accepts an exact path, and the usual workaround, a regex such as `#(?:[^/\s]+/)*personal\b`, is clumsy, slow, misses tags declared in frontmatter, and also matches things like `#C/BB`.
+`#novel/fiction`, `#play/fiction` and `#projects/fiction/mynovel` all contain the same node `fiction`. Native search cannot follow it: `tag:` only accepts an exact path, and the usual workaround, a regex such as `#(?:[^/\s]+/)*fiction\b`, is clumsy, slow, unsupported by vanilla Obsidian, misses tags declared in frontmatter, and also matches things like `#play/unrealisticfiction`.
 
 DAGtags lets you query by **node** instead of by full path. Type a pattern in the search field, press **Enter**, and it is rewritten into native `tag:` searches. Obsidian does the rest.
 
@@ -34,16 +34,15 @@ DAGtags does not store, build or modify a graph, and it never touches your notes
 ## Features
 
 - Wildcards in the core search pane: `*` for one segment, `**` for any number of segments.
-- Finds sub-tags at **any depth** and under **any parent**.
+- Finds subtags at **any depth** and under **any parent**.
 - Works with inline tags and frontmatter tags, using Obsidian's own metadata cache.
 - Output is plain native `tag:` syntax, so it combines with every other search operator, `OR`, groups and negation.
-- Descendants are de-duplicated: `tag:#A/**` does not list `#A/B` and `#A/B/F` separately, since `tag:#A/B` already covers the latter.
 - No internals patched. Only public Obsidian API and one DOM selector are used.
 - Nothing is stored, no settings, no network access.
 
 ## Usage
 
-Type a tag pattern in the search pane and press **Enter**. Assuming a vault with `#A/B`, `#C/B`, `#D/B/F` and `#personal`:
+Type a tag pattern in the search pane and press **Enter**. Assuming a vault with `#A/B`, `#C/B` and `#D/B/F`:
 
 | You type | Matches | Becomes |
 |---|---|---|
@@ -74,10 +73,10 @@ Type a tag pattern in the search pane and press **Enter**. Assuming a vault with
 |---|---|
 | `DAGtags: Expand tag wildcards in the search field` | Does the same as pressing Enter. Useful as a fallback, or to bind to a hotkey. |
 
-## Limitations
+## Current limitations
 
 - **Descendants are included.** Native `tag:#A/B` also returns notes tagged `#A/B/anything`. Native search cannot exclude descendants, so `tag:#*/B` cannot either.
-- **The expansion is a snapshot.** The field shows the expanded query afterwards, so tags created later are not picked up until you retype the pattern.
+- **The expansion is a snapshot.** The field shows the expanded query afterwards, so tags created later are not picked up until you retype the pattern. No live preview as you type either.
 - **Core search only.** Other search plugins, such as Omnisearch, are not supported yet. They rank tokenised text and have no `tag:` operator, so the same approach does not carry over directly.
 - **Relies on the search field's DOM.** If a future Obsidian version changes it, the Enter shortcut stops working and the command above remains as a fallback.
 
@@ -106,7 +105,7 @@ Requires Obsidian 1.5.0 or later.
 git clone https://github.com/Neomoorea/obsidian-dagtags.git
 cd obsidian-dagtags
 npm install
-npm run build     # type-check against the Obsidian typings, then bundle main.js
+npm run build
 ```
 
 This produces `main.js` and `manifest.json` at the
