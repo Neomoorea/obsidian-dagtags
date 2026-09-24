@@ -1,0 +1,10 @@
+{
+	"id": "dagtags",
+	"name": "DAGtags",
+	"version": "0.1.0",
+	"minAppVersion": "1.5.0",
+	"description": "Treat nested tags as a DAG: find a sub-tag under any parent with wildcards (tag:#**/personal), straight from the core search pane.",
+	"author": "Neomoorea",
+	"authorUrl": "https://github.com/Neomoorea",
+	"isDesktopOnly": false
+}

@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"module": "ESNext",
+		"target": "ES2018",
+		"moduleResolution": "bundler",
+		"strict": true,
+		"noEmit": true,
+		"importHelpers": true,
+		"isolatedModules": true,
+		"skipLibCheck": true,
+		"lib": ["DOM", "ES2019"],
+		"types": ["node"]
+	},
+	"include": ["src/**/*.ts", "tests/**/*.ts"]
+}

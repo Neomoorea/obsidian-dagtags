@@ -1,0 +1,38 @@
+{
+  "name": "dagtags",
+  "version": "0.1.0",
+  "description": "Treat nested Obsidian tags as a DAG: search any sub-tag under any parent with wildcards.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node esbuild.tests.mjs && node --test .test-build/*.test.js",
+    "build": "tsc --noEmit && node esbuild.config.mjs production",
+    "dev": "node esbuild.config.mjs",
+    "version": "node version-bump.mjs && git add manifest.json versions.json"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "tags",
+    "dag",
+    "search"
+  ],
+  "author": "Neomoorea",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.6.2",
+    "esbuild": "^0.28.2",
+    "jsdom": "^30.1.1",
+    "obsidian": "^1.13.1",
+    "tslib": "^2.8.1",
+    "typescript": "^7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Neomoorea/obsidian-dagtags.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Neomoorea/obsidian-dagtags/issues"
+  },
+  "homepage": "https://github.com/Neomoorea/obsidian-dagtags#readme"
+}
