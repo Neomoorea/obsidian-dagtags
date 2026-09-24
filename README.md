@@ -23,7 +23,7 @@ graph LR
   projects --> fiction --> mynovel
 ```
 
-`#novel/fiction`, `#play/fiction` and `#projects/fiction/mynovel` all contain the same node `fiction`. Native search cannot follow it: `tag:` only accepts an exact path, and the usual workaround, a regex such as `#(?:[^/\s]+/)*fiction\b`, is clumsy, slow, unsupported by vanilla Obsidian, misses tags declared in frontmatter, and also matches things like `#play/fiction-draft`.
+`#novel/fiction`, `#play/fiction` and `#projects/fiction/mynovel` all contain the same node `fiction`. Native search cannot follow it: `tag:` only accepts an exact path, and the usual workaround, a regex such as `#(?:[^/\s]+/)*fiction\b`, is clumsy, slow, misses tags declared in frontmatter, and also matches things like `#play/fiction-draft`.
 
 DAGtags lets you query by **node** instead of by full path. Type a pattern in the search field, press **Enter**, and it is rewritten into native `tag:` searches. Obsidian does the rest.
 
