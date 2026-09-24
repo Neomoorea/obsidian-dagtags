@@ -1,7 +1,7 @@
 # DAGtags
 
 [![License](https://img.shields.io/github/license/Neomoorea/obsidian-dagtags)](LICENSE)
-[![Latest release](https://img.shields.io/github/v/release/Neomoorea/obsidian-dagtags)](https://github.com/Neomoorea/obsidian-dagtags/releases/latest)
+[![Release](https://img.shields.io/github/v/release/Neomoorea/obsidian-dagtags)](https://github.com/Neomoorea/obsidian-dagtags/releases/latest)
 ![Obsidian 1.5.0+](https://img.shields.io/badge/obsidian-1.5.0%2B-7c3aed?style=flat-square)
 
 **Treat your nested tags as a directed acyclic graph. Find any subtag, under any parent, straight from Obsidian's core search pane.**
