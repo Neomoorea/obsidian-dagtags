@@ -1,7 +1,7 @@
 {
   "name": "dagtags",
-  "version": "0.1.0",
-  "description": "Treat nested Obsidian tags as a DAG: search any sub-tag under any parent with wildcards.",
+  "version": "0.2.0",
+  "description": "Treat nested Obsidian tags as a DAG: search any sub-tag under any parent with wildcards, in core search and in Bases.",
   "main": "index.js",
   "scripts": {
     "test": "node esbuild.tests.mjs && node --test .test-build/*.test.js",
@@ -14,7 +14,8 @@
     "obsidian-plugin",
     "tags",
     "dag",
-    "search"
+    "search",
+    "bases"
   ],
   "author": "Neomoorea",
   "license": "MIT",

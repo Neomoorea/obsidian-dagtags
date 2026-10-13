@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/v/release/Neomoorea/obsidian-dagtags)](https://github.com/Neomoorea/obsidian-dagtags/releases/latest)
 ![Obsidian 1.5.0+](https://img.shields.io/badge/obsidian-1.5.0%2B-7c3aed?style=flat-square)
 
-**Treat your nested tags as a directed acyclic graph. Find any subtag, under any parent, straight from Obsidian's core search pane.**
+**Treat your nested tags as a directed acyclic graph. Find any subtag, under any parent, straight from Obsidian's core search pane and from Bases.**
 
 ```text
 tag:#*/B          →  (tag:#A/B OR tag:#C/B)
@@ -26,23 +26,29 @@ graph LR
 `#book/fiction`, `#play/fiction` and `#projects/fiction/mybook` all contain the same node `fiction`. Native search cannot follow it: `tag:` only accepts an exact path, and the usual workaround, a regex such as `#(?:[^/\s]+/)*fiction\b`, is clumsy, slow, misses tags declared in frontmatter, and also matches things like `#play/fiction-draft`.
 
 DAGtags lets you query by **node** instead of by full path. Type a pattern in the search field, press **Enter**, and it is rewritten into native `tag:` searches. Obsidian does the rest.
+Bases has no `tag:` operator, so there the same patterns filter the rows directly, live, as you type.
 
 ### What "DAG" means here
 
-DAGtags does not store, build or modify a graph, and it never touches your notes or tags. On each search it reads every tag path in your vault (inline and frontmatter) and matches your pattern against the path segments. The graph is a way of *thinking* about your tags: each segment is a node, each `/` is a parent-to-child edge, one node can have several parents, and a path never loops back on itself, so the structure is acyclic by construction.
+DAGtags does not store, build or modify a graph, and it never touches your notes or tags. On each search it reads the tag paths it needs (inline and frontmatter) and matches your pattern against the path segments. The graph is a way of *thinking* about your tags: each segment is a node, each `/` is a parent-to-child edge, one node can have several parents, and a path never loops back on itself, so the structure is acyclic by construction.
 
 ## Features
 
-- Wildcards in the core search pane: `*` for one segment, `**` for any number of segments.
+- Wildcards: `*` for one segment, `**` for any number of segments.
 - Finds subtags at **any depth** and under **any parent**.
+- Works in two places: the **core search pane** (press Enter) and the **Bases search bar** (filters live).
 - Works with inline tags and frontmatter tags, using Obsidian's own metadata cache.
-- Output is plain native `tag:` syntax, so it combines with every other search operator, `OR`, groups and negation.
-- No internals patched. Only public Obsidian API and one DOM selector are used.
+- Search pane output is plain native `tag:` syntax, so it combines with every other search operator, `OR`, groups and negation.
+- In Bases it works in every layout (table, cards, list, kanban, third-party), in `.base` tabs, embedded bases and `base` code blocks.
 - Nothing is stored, no settings, no network access.
 
 ## Usage
 
-Type a tag pattern in the search pane and press **Enter**. Assuming a vault with `#A/B`, `#C/B` and `#D/B/F`:
+Assuming a vault with `#A/B`, `#C/B` and `#D/B/F`.
+
+### In the search pane
+
+Type a tag pattern in the search pane and press **Enter**.
 
 | You type | Matches | Becomes |
 |---|---|---|
@@ -54,6 +60,33 @@ Type a tag pattern in the search pane and press **Enter**. Assuming a vault with
 | `-tag:#*/B` | excludes them all | `-tag:#A/B -tag:#C/B` |
 | `foo tag:#*/B -bar` | mixes freely with other terms | `foo (tag:#A/B OR tag:#C/B) -bar` |
 
+### In Bases
+
+Type a pattern: the rows are filtered as you type and your query is rendered live.
+
+| You type | Rows shown |
+|---|---|
+| `#*/B` | notes with a tag such as `A/B` or `C/B` |
+| `#*/B/**` | the same, plus anything below `B`, such as `D/B/F` |
+| `#**/B` | notes tagged `B` at any depth, including a root `#B` |
+| `#**/B/**` | `B` anywhere in the path, and everything below it |
+| `-#*/B` | notes with no such tag |
+| `#*/B reading` | notes with such a tag whose displayed properties also contain `reading` |
+| `#*/B #*/C` | notes that have both |
+
+- Anything that is not a DAGtags pattern goes to Bases' own search untouched: every word must be found in the displayed properties, as usual.
+- Patterns are matched against each note's own tags, whether or not a tags column is displayed.
+- Patterns are combined with **AND**, like every other word in Bases search.
+- A malformed pattern, or one that no tag in your vault fits, produces a notice once you pause typing, not on every keystroke.
+
+### Differences between the two
+
+| | Search pane | Bases |
+|---|---|---|
+| When it runs | on **Enter** | on every keystroke |
+| The field | rewritten into native `tag:` syntax | left as typed |
+| Descendants | included (native `tag:` search does that) | **not** included: add `/**` |
+
 ### Syntax
 
 | Token | Meaning |
@@ -62,7 +95,7 @@ Type a tag pattern in the search pane and press **Enter**. Assuming a vault with
 | `**` | **Zero or more** whole segments (must be a complete segment) |
 
 - A pattern must match the **whole** tag. Matching is case-insensitive, like Obsidian tags.
-- `tag:#pattern`, `tag:pattern` and a bare `#pattern` are all accepted, each optionally prefixed with `-`. A token is only treated as a pattern if it contains a `*`.
+- `tag:#pattern`, `tag:pattern` and a bare `#pattern` are all accepted, each optionally prefixed with `-`. A token is only treated as a pattern if it contains a `*`, so a plain `#tag` is left to Obsidian.
 - Write `tag:#pattern` with no space after the colon.
 - Text inside `"quotes"` and `/regex/` literals is never touched.
 - A trailing or doubled slash (`#*/B/`) is reported as malformed instead of being guessed at.
@@ -75,16 +108,17 @@ Type a tag pattern in the search pane and press **Enter**. Assuming a vault with
 
 ## Current limitations
 
-- **Descendants are included.** Native `tag:#A/B` also returns notes tagged `#A/B/anything`. Native search cannot exclude descendants, so `tag:#*/B` cannot either.
-- **The expansion is a snapshot.** The field shows the expanded query afterwards, so tags created later are not picked up until you retype the pattern. No live preview as you type either.
-- **Core search only.** Other search plugins, such as Omnisearch, are not supported yet. They rank tokenised text and have no `tag:` operator, so the same approach does not carry over directly.
-- **Relies on the search field's DOM.** If a future Obsidian version changes it, the Enter shortcut stops working and the command above remains as a fallback.
+- **Descendants are included in the search pane.** Native `tag:#A/B` also returns notes tagged `#A/B/anything`. Native search cannot exclude descendants, so `tag:#*/B` cannot either. Bases does not have this limitation, so the same pattern can return fewer notes there. Add `/**` to get the same notes.
+- **The search pane expansion is a snapshot.** The field shows the expanded query afterwards, so tags created later are not picked up until you retype the pattern. No live preview as you type either.
+- **Core search and Bases only.** Other search plugins are not supported yet.
+- **The search pane relies on the search field's DOM.** If a future Obsidian version changes it, the Enter shortcut stops working and the command above remains as a fallback.
+- **The Bases support relies on an Obsidian internal.** Bases has no public search API, so DAGtags wraps one method, `applySearchQuery`, on the public `QueryController` class. It is checked at load time, any error falls back to Obsidian's own Bases search, and it is removed when the plugin is disabled. If an Obsidian update changes that method, wildcards stop working in Bases (and only there).
 
 ## Installation
 
-Requires Obsidian 1.5.0 or later.
+Requires Obsidian 1.5.0 or later (1.12 or later for Bases support).
 
-### Option A — with BRAT
+### Option A: with BRAT
 
 1. Install **BRAT** (Beta Reviewer's Auto-update
    Tool) from Obsidian's Community Plugins browser, and enable it.
@@ -92,14 +126,13 @@ Requires Obsidian 1.5.0 or later.
    `Neomoorea/obsidian-dagtags`.
 3. Enable **DAGtags** under Community plugins.
 
-### Option B — manual install
+### Option B: manual install
 
 1. Download `main.js` and `manifest.json` from the [latest release](https://github.com/Neomoorea/obsidian-dagtags/releases/latest).
 2. Copy them into `<your vault>/.obsidian/plugins/dagtags/`.
 3. Reload Obsidian and enable **DAGtags** under *Settings → Community plugins*.
 
-
-### Option C — build from source
+### Option C: build from source
 
 ```bash
 git clone https://github.com/Neomoorea/obsidian-dagtags.git
@@ -108,10 +141,10 @@ npm install
 npm run build
 ```
 
-This produces `main.js` and `manifest.json` at the
-project root — copy those two files into `.obsidian/plugins/dagtags/`
-as above. `npm run dev` runs an incremental watch build if you want to
-modify the plugin.
+This produces `main.js` and `manifest.json` in the `dist/` folder. Copy
+those two files into `.obsidian/plugins/dagtags/` as above. `npm run dev`
+runs an incremental watch build if you want to modify the plugin, and
+`npm test` runs the tests.
 
 ## Licence
 

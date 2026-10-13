@@ -1,9 +1,9 @@
 {
 	"id": "dagtags",
 	"name": "DAGtags",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"minAppVersion": "1.5.0",
-	"description": "Find subtags under any parent with wildcards, straight from the core search pane.",
+	"description": "Find subtags under any parent with wildcards, straight from core search and Bases.",
 	"author": "Neomoorea",
 	"authorUrl": "https://github.com/Neomoorea",
 	"isDesktopOnly": false

@@ -1,14 +1,18 @@
-import { Notice, Plugin, getAllTags } from "obsidian";
+import { Notice, Plugin } from "obsidian";
+import { installBasesSearch } from "./bases-search";
 import { expandQuery } from "./expand";
+import { IssueReporter } from "./issues";
+import { collectVaultTags } from "./tags";
 
 /**
- * Only public API plus two DOM selectors are used. No Obsidian internals are patched.
- * If Obsidian renames these classes in future, the plugin degrades to doing nothing
- * (the command below is a manual fallback).
+ * Search pane: only public API plus two DOM selectors are used, nothing is patched. If Obsidian
+ * renames these classes in future, it degrades to doing nothing (the command below is a manual fallback).
+ *
+ * Bases: see bases-search.ts, which wraps one internal method and explains why.
  */
 const SEARCH_FIELD = '.workspace-leaf-content[data-type="search"] .search-input-container';
 
-export default class TagGlobSearchPlugin extends Plugin {
+export default class DagTagsPlugin extends Plugin {
 	async onload() {
 		// Capture phase: we must rewrite the field BEFORE Obsidian's own Enter handler reads it.
 		this.registerDomEvent(document, "keydown", this.onKeydown, { capture: true });
@@ -35,6 +39,12 @@ export default class TagGlobSearchPlugin extends Plugin {
 				}
 			},
 		});
+
+		// Bases search bar: filters live, so there is no Enter key to hook.
+		const reporter = new IssueReporter(this.app);
+		this.register(() => reporter.dispose());
+		const uninstall = installBasesSearch(this.app, reporter);
+		if (uninstall) this.register(uninstall);
 	}
 
 	private onKeydown = (evt: KeyboardEvent): void => {
@@ -53,7 +63,7 @@ export default class TagGlobSearchPlugin extends Plugin {
 		const before = input.value;
 		if (!before.includes("*")) return false;
 
-		const result = expandQuery(before, this.collectTags());
+		const result = expandQuery(before, collectVaultTags(this.app));
 
 		for (const token of result.unmatched) {
 			new Notice(`DAGtags: no tag matches ${token}`);
@@ -68,23 +78,5 @@ export default class TagGlobSearchPlugin extends Plugin {
 		// Make Obsidian's own search component notice the new value.
 		input.dispatchEvent(new Event("input", { bubbles: true }));
 		return true;
-	}
-
-	/**
-	 * Every tag in the vault, without "#", de-duplicated case-insensitively.
-	 * Built from the public metadata API, so inline AND frontmatter tags are included.
-	 * Computed on demand (at Enter), so there is no cache to invalidate.
-	 */
-	private collectTags(): string[] {
-		const seen = new Map<string, string>();
-		for (const file of this.app.vault.getMarkdownFiles()) {
-			const cache = this.app.metadataCache.getFileCache(file);
-			if (!cache) continue;
-			for (const tag of getAllTags(cache) ?? []) {
-				const key = tag.toLowerCase();
-				if (!seen.has(key)) seen.set(key, tag.replace(/^#/, ""));
-			}
-		}
-		return [...seen.values()];
 	}
 }
